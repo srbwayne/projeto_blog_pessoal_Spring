@@ -1,28 +1,39 @@
 package org.generation.blogPessoal.controller;
 
+import org.generation.blogPessoal.model.dto.PostagemDto;
+import org.generation.blogPessoal.service.PostagemService;
+import org.generation.blogPessoal.service.impl.PostagemServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import org.generation.blogPessoal.model.Postagem;
-import org.generation.blogPessoal.repository.PostagemRepository;
-
+@RequestMapping("/api/postagem")
 @RestController
-@RequestMapping("/postagens")
-@CrossOrigin("*")
 public class PostagemController {
+	private final PostagemService postagemService;
 
 	@Autowired
-	private PostagemRepository repositoty;
-
-	@GetMapping
-	public ResponseEntity<List<Postagem>> GetAll(){
-		return ResponseEntity.ok(repositoty.findAll());
+	public PostagemController(PostagemServiceImpl postagemService) {
+		this.postagemService = postagemService;
 	}
 
+	@PostMapping
+	public ResponseEntity<Void> save(@RequestBody @Validated PostagemDto postagemDto) {
+		postagemService.save(postagemDto);
+		return ResponseEntity.ok().build();
+	}
+
+	@GetMapping
+	public ResponseEntity<List<PostagemDto>> GetAll(){
+		return ResponseEntity.ok(postagemService.findAll());
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<Void> update(@RequestBody @Validated PostagemDto postagemDto, @PathVariable("id") long id) {
+		postagemService.update(postagemDto, id);
+		return ResponseEntity.ok().build();
+	}
 }
